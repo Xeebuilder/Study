@@ -70,7 +70,7 @@ export function VoiceSettingsModal({
             <label className="flex items-center justify-between text-xs font-medium text-zinc-300">
               <span className="flex items-center gap-1.5">
                 <Volume2 className="w-3.5 h-3.5 text-rose-400" />
-                Voz Host 1 (Valeria / Conductora A)
+                Voz Host 1 (Valeria / Femenina)
               </span>
               {idA && (
                 <span className="text-[10px] font-mono text-zinc-500 truncate max-w-[150px]">
@@ -82,7 +82,7 @@ export function VoiceSettingsModal({
               type="text"
               value={inputVoiceA}
               onChange={(e) => setInputVoiceA(e.target.value)}
-              placeholder="Pega el enlace o Voice ID de ElevenLabs (ej: 21m00Tcm4TlvDq8ikWAM)"
+              placeholder="7DsPNelW3gSv6Oxki5sa"
               className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 text-xs text-zinc-200 placeholder-zinc-600 outline-none transition-all font-mono"
             />
           </div>
@@ -92,7 +92,7 @@ export function VoiceSettingsModal({
             <label className="flex items-center justify-between text-xs font-medium text-zinc-300">
               <span className="flex items-center gap-1.5">
                 <Volume2 className="w-3.5 h-3.5 text-amber-400" />
-                Voz Host 2 (Mateo / Conductor B)
+                Voz Host 2 (Mateo / Masculina)
               </span>
               {idB && (
                 <span className="text-[10px] font-mono text-zinc-500 truncate max-w-[150px]">
@@ -104,7 +104,7 @@ export function VoiceSettingsModal({
               type="text"
               value={inputVoiceB}
               onChange={(e) => setInputVoiceB(e.target.value)}
-              placeholder="Pega el enlace o Voice ID de ElevenLabs (ej: EXAVITQu4vr4xnSDxMaL)"
+              placeholder="3mmJ2Z5SLZ9OkeZZcv5p"
               className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 text-xs text-zinc-200 placeholder-zinc-600 outline-none transition-all font-mono"
             />
           </div>

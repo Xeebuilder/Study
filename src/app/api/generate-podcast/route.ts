@@ -56,69 +56,74 @@ export async function POST(req: NextRequest) {
 
     const vibeDescriptions: Record<PodcastVibe, string> = {
       'puro-chisme':
-        'Estilo "El Puro Chisme" / "El Té": Mucho drama, suspenso, analogías de telenovela, expresiones como "¡Amiga, no me lo vas a creer!", "Suelta la sopa", "Párale a tu carro". Super divertido y enganchador, pero explicando los conceptos científicos/académicos con total exactitud.',
+        'Estilo Divulgación Científica y Narrativa Inteligente: Elocuente, cautivador, utiliza analogías ingeniosas y rigurosas de la vida real sin caer en chismes superficiales ni bromas infantiles. Explica los conceptos complejos con claridad meridiana.',
       'estudio-relajado':
-        'Estilo "Compañeros de Estudio": Amigable, buena vibra, como dos amigos tomando café en la biblioteca que se hacen preguntas y se ayudan con metáforas cotidianas.',
+        'Estilo Mesa de Diálogo Académico: Conversación natural, respetuosa y reflexiva entre dos colegas de estudio analizando a fondo los mecanismos del tema.',
       'el-esceptico':
-        'Estilo "El Escéptico vs El Cerebrito": Valeria duda de todo, no entiende cómo algo tan loco puede ser verdad o por qué los profesores lo preguntan, y Mateo le explica con paciencia, lógica y pruebas claras.',
+        'Estilo Análisis Crítico & Demostración: Valeria plantea preguntas incisivas sobre por qué ocurren los fenómenos, y Mateo demuestra la lógica científica y matemática detrás.',
       'repaso-expres':
-        'Estilo "Repaso Exprés / Modo Examen": Dinámico, al grano, lleno de trucos de memoria, mnemotecnias y "Ojo aquí que esto es pregunta fija de examen".',
+        'Estilo Síntesis Ejecutiva de Examen: Directo al grano, ágil, estructurado, destacando definiciones operativas y patrones de examen.',
     };
 
     const selectedVibe = vibeDescriptions[vibe] || vibeDescriptions['puro-chisme'];
 
     const promptText = `
-Eres el productor y guionista estrella del podcast educativo en español "ChismeStudy" (¡Qué Chisme!).
-Tu misión es transformar el material de estudio en las imágenes adjuntas en un episodio de podcast súper entretenido, fácil de entender y memorable para estudiar.
+Eres el productor y guionista principal de un podcast educativo y científico de primer nivel en español (al estilo de Radiolab, NPR, TED o divulgación universitaria de alta calidad).
+Tu misión es transformar el material de estudio visual adjunto en un episodio de podcast enriquecedor, inteligente, dinámico y pedagógico.
 
-IDIOMA: TODO EL EPISODIO DEBE ESTAR COMPLETAMENTE EN ESPAÑOL NATURAL, COLOQUIAL Y ENGANCHADOR.
+PAUTAS EDITORIALES CRÍTICAS:
+- NO uses chismes baratos, ni dramas juveniles, ni referencias a "exnovios" o relaciones amorosas.
+- El tono debe ser el de un PODCAST REAL: culto, elocuente, ameno, curioso y con un respeto absoluto por el rigor del contenido.
+- Explica los términos técnicos, diagramas y ecuaciones con precisión para que un estudiante universitario o de secundaria domine el tema a fondo.
 
-IMÁGENES PROPORCIONADAS:
-Hay ${images.length} imagen(es) adjunta(s). Analiza a fondo cada una: texto, fórmulas, diagramas, esquemas, flechas y títulos.
-Los índices de las imágenes van de 0 a ${images.length - 1} (en el orden proporcionado).
+IDIOMA: ESPAÑOL NATURAL, FLUIDO Y ARTICULADO.
+
+IMÁGENES ADJUNTAS:
+Hay ${images.length} imagen(es). Analiza cada una minuciosamente: esquemas, flechas, procesos, textos, títulos y fórmulas.
+Los índices van de 0 a ${images.length - 1}.
 
 TEMA O ENFOQUE SOLICITADO:
-${topic ? `Enfócate principalmente en: "${topic}"` : 'Identifica el tema central a partir de las imágenes.'}
+${topic ? `Enfócate con prioridad en: "${topic}"` : 'Identifica y desarrolla el tema central a partir de las imágenes.'}
 
-TONO SELECCIONADO:
+FORMATO Y ENFOQUE:
 ${selectedVibe}
 
-PERSONAJES:
-1. Valeria (Host A): Curiosa, expresiva, graciosa, hace las preguntas que todo estudiante se hace, busca el drama detrás de cada concepto ("¿O sea que el átomo es tóxico?", "No me digas que eso viene en el examen").
-2. Mateo (Host B): El amigo que se leyó el libro, tiene los datos exactos, explica con analogías de la vida real, aclara los mitos y da los "tips de oro" para el examen.
+CO-CONDUCTORES:
+1. Valeria (Host A): Conductora reflexiva y analítica. Plantea las preguntas de fondo, conecta los puntos entre etapas y resume las conclusiones clave.
+2. Mateo (Host B): Conductor y especialista técnico. Explica los mecanismos moleculares/históricos/físicos con claridad, rigor y analogías de alta calidad.
 
-REQUISITOS IMPORTANTES:
-1. Longitud: Entre 12 y 18 intervenciones de diálogo alternando de forma dinámica entre Valeria y Mateo.
-2. Cada línea de diálogo debe tener un "referencedImageIndex" (número entre 0 y ${images.length - 1}) indicando qué diapositiva o imagen están viendo/discutiendo en ese momento, para que la pantalla del estudiante cambie de diapositiva automáticamente mientras escucha.
-3. Precisión académica: El "chisme" es el vehículo pedagógico, pero los datos, términos técnicos y definiciones deben ser 100% correctos para que el estudiante apruebe su examen.
-4. Incluye de 3 a 5 "keyTakeaways" (puntos clave para el examen) con concepto, explicación concisa y un "examTip" (truco de examen).
+REQUISITOS ESTRUCTURALES:
+1. Entre 12 y 16 intervenciones de diálogo alternando de forma natural entre Valeria y Mateo.
+2. Cada línea de diálogo debe incluir "referencedImageIndex" (número entre 0 y ${images.length - 1}) indicando qué diapositiva o figura están abordando en ese momento.
+3. Precisión conceptual impecable para garantizar el éxito en exámenes.
+4. Genera de 3 a 5 "keyTakeaways" (puntos de evaluación académica) con concepto, explicación clara y un "examTip" (orientación técnica para exámenes).
 
-RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA (SIN MARKDOWN EXTRA, SOLO JSON):
+RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA (SIN TEXTO ADICIONAL):
 {
-  "title": "Título llamativo del episodio con emojis (en español)",
-  "subtitle": "Subtítulo intrigante de una sola frase",
-  "topic": "Nombre del tema o materia",
+  "title": "Título profesional del episodio (en español)",
+  "subtitle": "Subtítulo conciso y elegante",
+  "topic": "Nombre del tema o disciplina",
   "dialogue": [
     {
       "speaker": "hostA",
       "speakerName": "Valeria",
-      "text": "Línea hablada por Valeria en español...",
-      "emotion": "chismoso",
+      "text": "Intervención de Valeria...",
+      "emotion": "explicando",
       "referencedImageIndex": 0
     },
     {
       "speaker": "hostB",
       "speakerName": "Mateo",
-      "text": "Respuesta de Mateo con la explicación...",
+      "text": "Intervención de Mateo...",
       "emotion": "explicando",
       "referencedImageIndex": 0
     }
   ],
   "keyTakeaways": [
     {
-      "concept": "Nombre del concepto clave",
-      "explanation": "Explicación clara y sin rodeos",
-      "examTip": "Tip específico para responder preguntas de examen"
+      "concept": "Concepto evaluable",
+      "explanation": "Fundamento teórico conciso",
+      "examTip": "Criterio o trampa común en evaluaciones"
     }
   ]
 }
@@ -213,22 +218,22 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA (SIN 
         hostA: {
           id: 'hostA',
           name: 'Valeria',
-          role: 'La que trae las preguntas y el chisme',
-          avatar: '👩🏻‍🦰',
+          role: 'Co-conductora • Análisis Conceptual',
+          avatar: '👩🏻‍💼',
           voiceGender: 'female',
-          defaultPitch: 1.15,
-          defaultRate: 1.05,
-          elevenLabsVoiceId: '3mmJ2Z5SLZ9OkeZZcv5p',
+          defaultPitch: 1.0,
+          defaultRate: 1.0,
+          elevenLabsVoiceId: '7DsPNelW3gSv6Oxki5sa',
         },
         hostB: {
           id: 'hostB',
           name: 'Mateo',
-          role: 'El que suelta la sopa y los datos del libro',
-          avatar: '👨🏻‍🏫',
+          role: 'Co-conductor • Divulgación y Mecanismos',
+          avatar: '👨🏻‍🔬',
           voiceGender: 'male',
-          defaultPitch: 0.92,
-          defaultRate: 1.02,
-          elevenLabsVoiceId: '7DsPNelW3gSv6Oxki5sa',
+          defaultPitch: 1.0,
+          defaultRate: 1.0,
+          elevenLabsVoiceId: '3mmJ2Z5SLZ9OkeZZcv5p',
         },
       },
       images,

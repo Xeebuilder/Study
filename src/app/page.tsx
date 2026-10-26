@@ -29,8 +29,8 @@ const STORAGE_KEY_VOICE_A = 'chismestudy_eleven_voice_a';
 const STORAGE_KEY_VOICE_B = 'chismestudy_eleven_voice_b';
 const STORAGE_KEY_ELEVEN_KEY = 'chismestudy_eleven_api_key';
 
-const DEFAULT_VOICE_A = '3mmJ2Z5SLZ9OkeZZcv5p';
-const DEFAULT_VOICE_B = '7DsPNelW3gSv6Oxki5sa';
+const DEFAULT_VOICE_A = '7DsPNelW3gSv6Oxki5sa'; // Valeria (voz femenina)
+const DEFAULT_VOICE_B = '3mmJ2Z5SLZ9OkeZZcv5p'; // Mateo (voz masculina)
 
 export default function Home() {
   const [apiKey, setApiKey] = useState<string>('');
@@ -59,7 +59,17 @@ export default function Home() {
       const storedKey = localStorage.getItem(STORAGE_KEY_API);
       if (storedKey) setApiKey(storedKey);
 
-      const storedVoiceA = localStorage.getItem(STORAGE_KEY_VOICE_A);
+      let storedVoiceA = localStorage.getItem(STORAGE_KEY_VOICE_A);
+      let storedVoiceB = localStorage.getItem(STORAGE_KEY_VOICE_B);
+
+      // Auto-correct previously inverted voice IDs
+      if (storedVoiceA === '3mmJ2Z5SLZ9OkeZZcv5p' && storedVoiceB === '7DsPNelW3gSv6Oxki5sa') {
+        storedVoiceA = DEFAULT_VOICE_A;
+        storedVoiceB = DEFAULT_VOICE_B;
+        localStorage.setItem(STORAGE_KEY_VOICE_A, DEFAULT_VOICE_A);
+        localStorage.setItem(STORAGE_KEY_VOICE_B, DEFAULT_VOICE_B);
+      }
+
       if (storedVoiceA) {
         setVoiceA(storedVoiceA);
       } else {
@@ -67,7 +77,6 @@ export default function Home() {
         localStorage.setItem(STORAGE_KEY_VOICE_A, DEFAULT_VOICE_A);
       }
 
-      const storedVoiceB = localStorage.getItem(STORAGE_KEY_VOICE_B);
       if (storedVoiceB) {
         setVoiceB(storedVoiceB);
       } else {
