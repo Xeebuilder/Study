@@ -130,7 +130,8 @@ export const DEMO_EPISODE: PodcastEpisode = {
       avatar: '👩🏻‍🦰',
       voiceGender: 'female',
       defaultPitch: 1.15,
-      defaultRate: 1.05
+      defaultRate: 1.05,
+      elevenLabsVoiceId: '3mmJ2Z5SLZ9OkeZZcv5p',
     },
     hostB: {
       id: 'hostB',
@@ -139,7 +140,8 @@ export const DEMO_EPISODE: PodcastEpisode = {
       avatar: '👨🏻‍🏫',
       voiceGender: 'male',
       defaultPitch: 0.92,
-      defaultRate: 1.02
+      defaultRate: 1.02,
+      elevenLabsVoiceId: '7DsPNelW3gSv6Oxki5sa',
     }
   },
   images: [

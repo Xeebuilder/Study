@@ -29,6 +29,9 @@ const STORAGE_KEY_VOICE_A = 'chismestudy_eleven_voice_a';
 const STORAGE_KEY_VOICE_B = 'chismestudy_eleven_voice_b';
 const STORAGE_KEY_ELEVEN_KEY = 'chismestudy_eleven_api_key';
 
+const DEFAULT_VOICE_A = '3mmJ2Z5SLZ9OkeZZcv5p';
+const DEFAULT_VOICE_B = '7DsPNelW3gSv6Oxki5sa';
+
 export default function Home() {
   const [apiKey, setApiKey] = useState<string>('');
   const [images, setImages] = useState<StudyImage[]>([]);
@@ -38,9 +41,9 @@ export default function Home() {
   const [loadingStepText, setLoadingStepText] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // ElevenLabs Voice configuration
-  const [voiceA, setVoiceA] = useState<string>('');
-  const [voiceB, setVoiceB] = useState<string>('');
+  // ElevenLabs Voice configuration with user's selected voices
+  const [voiceA, setVoiceA] = useState<string>(DEFAULT_VOICE_A);
+  const [voiceB, setVoiceB] = useState<string>(DEFAULT_VOICE_B);
   const [elevenLabsApiKey, setElevenLabsApiKey] = useState<string>('');
 
   const [activeEpisode, setActiveEpisode] = useState<PodcastEpisode | null>(null);
@@ -57,10 +60,20 @@ export default function Home() {
       if (storedKey) setApiKey(storedKey);
 
       const storedVoiceA = localStorage.getItem(STORAGE_KEY_VOICE_A);
-      if (storedVoiceA) setVoiceA(storedVoiceA);
+      if (storedVoiceA) {
+        setVoiceA(storedVoiceA);
+      } else {
+        setVoiceA(DEFAULT_VOICE_A);
+        localStorage.setItem(STORAGE_KEY_VOICE_A, DEFAULT_VOICE_A);
+      }
 
       const storedVoiceB = localStorage.getItem(STORAGE_KEY_VOICE_B);
-      if (storedVoiceB) setVoiceB(storedVoiceB);
+      if (storedVoiceB) {
+        setVoiceB(storedVoiceB);
+      } else {
+        setVoiceB(DEFAULT_VOICE_B);
+        localStorage.setItem(STORAGE_KEY_VOICE_B, DEFAULT_VOICE_B);
+      }
 
       const storedElevenKey = localStorage.getItem(STORAGE_KEY_ELEVEN_KEY);
       if (storedElevenKey) setElevenLabsApiKey(storedElevenKey);

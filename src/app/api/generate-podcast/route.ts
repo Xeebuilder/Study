@@ -218,6 +218,7 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA (SIN 
           voiceGender: 'female',
           defaultPitch: 1.15,
           defaultRate: 1.05,
+          elevenLabsVoiceId: '3mmJ2Z5SLZ9OkeZZcv5p',
         },
         hostB: {
           id: 'hostB',
@@ -227,6 +228,7 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA (SIN 
           voiceGender: 'male',
           defaultPitch: 0.92,
           defaultRate: 1.02,
+          elevenLabsVoiceId: '7DsPNelW3gSv6Oxki5sa',
         },
       },
       images,
