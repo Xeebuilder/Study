@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { DialogueLine, StudyImage } from '@/types/podcast';
-import { Play, Volume2 } from 'lucide-react';
+import { Play, Volume2, Headphones } from 'lucide-react';
 
 interface TranscriptViewProps {
   dialogue: DialogueLine[];
@@ -21,7 +21,6 @@ export function TranscriptView({
 }: TranscriptViewProps) {
   const activeLineRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-scroll the active line into view smoothly
   useEffect(() => {
     if (activeLineRef.current) {
       activeLineRef.current.scrollIntoView({
@@ -31,17 +30,8 @@ export function TranscriptView({
     }
   }, [currentLineIndex]);
 
-  const emotionEmojis: Record<string, string> = {
-    chismoso: '🍵 Chisme',
-    sorprendido: '😲 ¡Quééé!',
-    riendo: '😂 Ja, ja',
-    explicando: '💡 Datazo',
-    dudoso: '🤨 ¿Seguro?',
-    enfatico: '🔥 Ojo aquí',
-  };
-
   return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4 max-h-[560px] overflow-y-auto space-y-3 custom-scrollbar">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 max-h-[560px] overflow-y-auto space-y-2.5 custom-scrollbar">
       {dialogue.map((line, idx) => {
         const isActive = idx === currentLineIndex;
         const isHostA = line.speaker === 'hostA';
@@ -53,51 +43,45 @@ export function TranscriptView({
             onClick={() => onSelectLine(idx)}
             className={`group relative p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${
               isActive
-                ? isHostA
-                  ? 'bg-rose-950/40 border-rose-500/80 ring-1 ring-rose-500/50 shadow-md shadow-rose-950/40'
-                  : 'bg-amber-950/40 border-amber-500/80 ring-1 ring-amber-500/50 shadow-md shadow-amber-950/40'
-                : 'bg-neutral-950/50 border-neutral-800/80 hover:border-neutral-700 hover:bg-neutral-900/60'
+                ? 'bg-zinc-900 border-zinc-500 shadow-sm'
+                : 'bg-zinc-900/30 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/60'
             }`}
           >
-            {/* Header info */}
-            <div className="flex items-center justify-between gap-2 mb-2">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-2 mb-1.5">
               <div className="flex items-center gap-2">
-                <span className="text-xl select-none">
-                  {isHostA ? '👩🏻‍🦰' : '👨🏻‍🏫'}
-                </span>
-                <span
-                  className={`text-xs font-bold ${
-                    isHostA ? 'text-rose-300' : 'text-amber-300'
-                  }`}
-                >
+                <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${
+                  isHostA ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-800 text-zinc-400'
+                }`}>
+                  {isHostA ? 'H1' : 'H2'}
+                </div>
+                <span className="text-xs font-semibold text-zinc-200">
                   {line.speakerName}
                 </span>
 
-                {/* Emotion Badge */}
                 {line.emotion && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800/90 text-neutral-300 font-medium">
-                    {emotionEmojis[line.emotion] || line.emotion}
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-400 border border-zinc-800">
+                    {line.emotion}
                   </span>
                 )}
               </div>
 
-              {/* Badges: referenced slide and play indicator */}
               <div className="flex items-center gap-2">
                 {typeof line.referencedImageIndex === 'number' &&
                   images[line.referencedImageIndex] && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 font-mono border border-neutral-700">
-                      Diapositiva {line.referencedImageIndex + 1}
+                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-400 font-mono border border-zinc-800">
+                      Slide {line.referencedImageIndex + 1}
                     </span>
                   )}
 
                 {isActive && isPlaying ? (
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-rose-400">
-                    <Volume2 className="w-3.5 h-3.5 animate-pulse" />
-                    <span className="hidden sm:inline">En vivo</span>
+                  <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-200">
+                    <Volume2 className="w-3.5 h-3.5 animate-pulse text-zinc-300" />
+                    <span className="hidden sm:inline">Activo</span>
                   </div>
                 ) : (
                   <button
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md bg-neutral-800 text-neutral-300 hover:text-white"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md bg-zinc-800 text-zinc-400 hover:text-white"
                     title="Escuchar desde esta línea"
                   >
                     <Play className="w-3 h-3 fill-current" />
@@ -108,10 +92,10 @@ export function TranscriptView({
 
             {/* Line Text */}
             <p
-              className={`text-sm leading-relaxed ${
+              className={`text-xs sm:text-sm leading-relaxed ${
                 isActive
-                  ? 'text-white font-medium'
-                  : 'text-neutral-300 group-hover:text-neutral-100'
+                  ? 'text-zinc-100 font-medium'
+                  : 'text-zinc-400 group-hover:text-zinc-200'
               }`}
             >
               {line.text}

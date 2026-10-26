@@ -10,10 +10,24 @@ import { EpisodeConfig } from '@/components/EpisodeConfig';
 import { PodcastPlayer } from '@/components/PodcastPlayer';
 import { ApiKeyModal } from '@/components/ApiKeyModal';
 import { SavedEpisodesDrawer } from '@/components/SavedEpisodesDrawer';
-import { Sparkles, Coffee, AlertCircle, ArrowLeft, Headphones, CheckCircle, Brain, Volume2 } from 'lucide-react';
+import { VoiceSettingsModal } from '@/components/VoiceSettingsModal';
+import {
+  Sparkles,
+  AlertCircle,
+  ArrowLeft,
+  Headphones,
+  SlidersHorizontal,
+  CheckCircle2,
+  AudioWaveform,
+  Layers,
+  Zap,
+} from 'lucide-react';
 
 const STORAGE_KEY_API = 'chismestudy_gemini_api_key';
 const STORAGE_KEY_SAVED = 'chismestudy_saved_episodes';
+const STORAGE_KEY_VOICE_A = 'chismestudy_eleven_voice_a';
+const STORAGE_KEY_VOICE_B = 'chismestudy_eleven_voice_b';
+const STORAGE_KEY_ELEVEN_KEY = 'chismestudy_eleven_api_key';
 
 export default function Home() {
   const [apiKey, setApiKey] = useState<string>('');
@@ -24,17 +38,32 @@ export default function Home() {
   const [loadingStepText, setLoadingStepText] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // ElevenLabs Voice configuration
+  const [voiceA, setVoiceA] = useState<string>('');
+  const [voiceB, setVoiceB] = useState<string>('');
+  const [elevenLabsApiKey, setElevenLabsApiKey] = useState<string>('');
+
   const [activeEpisode, setActiveEpisode] = useState<PodcastEpisode | null>(null);
   const [savedEpisodes, setSavedEpisodes] = useState<PodcastEpisode[]>([]);
 
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isSavedModalOpen, setIsSavedModalOpen] = useState(false);
 
-  // Load API key and saved episodes from localStorage on mount
+  // Load configuration from localStorage on mount
   useEffect(() => {
     try {
       const storedKey = localStorage.getItem(STORAGE_KEY_API);
       if (storedKey) setApiKey(storedKey);
+
+      const storedVoiceA = localStorage.getItem(STORAGE_KEY_VOICE_A);
+      if (storedVoiceA) setVoiceA(storedVoiceA);
+
+      const storedVoiceB = localStorage.getItem(STORAGE_KEY_VOICE_B);
+      if (storedVoiceB) setVoiceB(storedVoiceB);
+
+      const storedElevenKey = localStorage.getItem(STORAGE_KEY_ELEVEN_KEY);
+      if (storedElevenKey) setElevenLabsApiKey(storedElevenKey);
 
       const storedEpisodes = localStorage.getItem(STORAGE_KEY_SAVED);
       if (storedEpisodes) {
@@ -58,6 +87,32 @@ export default function Home() {
       }
     } catch (e) {
       console.warn('Storage write error:', e);
+    }
+  };
+
+  const handleSaveVoices = (newVoiceA: string, newVoiceB: string, newApiKey: string) => {
+    setVoiceA(newVoiceA);
+    setVoiceB(newVoiceB);
+    setElevenLabsApiKey(newApiKey);
+    try {
+      localStorage.setItem(STORAGE_KEY_VOICE_A, newVoiceA);
+      localStorage.setItem(STORAGE_KEY_VOICE_B, newVoiceB);
+      localStorage.setItem(STORAGE_KEY_ELEVEN_KEY, newApiKey);
+    } catch (e) {
+      console.warn('Storage write error:', e);
+    }
+
+    // If an episode is currently active, update its host voice settings dynamically
+    if (activeEpisode) {
+      const updatedEpisode = {
+        ...activeEpisode,
+        hosts: {
+          ...activeEpisode.hosts,
+          hostA: { ...activeEpisode.hosts.hostA, elevenLabsVoiceId: newVoiceA },
+          hostB: { ...activeEpisode.hosts.hostB, elevenLabsVoiceId: newVoiceB },
+        },
+      };
+      setActiveEpisode(updatedEpisode);
     }
   };
 
@@ -88,7 +143,15 @@ export default function Home() {
   };
 
   const handleLoadDemo = () => {
-    setActiveEpisode(DEMO_EPISODE);
+    // Attach current elevenlabs voices if configured
+    const demo = {
+      ...DEMO_EPISODE,
+      hosts: {
+        hostA: { ...DEMO_EPISODE.hosts.hostA, elevenLabsVoiceId: voiceA || undefined },
+        hostB: { ...DEMO_EPISODE.hosts.hostB, elevenLabsVoiceId: voiceB || undefined },
+      },
+    };
+    setActiveEpisode(demo);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -102,11 +165,10 @@ export default function Home() {
     setIsGenerating(true);
 
     const steps = [
-      '🔍 Leyendo y analizando tus diapositivas con visión artificial...',
-      '☕ Preparando el cafecito para Valeria y Mateo...',
-      '🎭 Encontrando el drama y las analogías del chisme...',
-      '📝 Redactando el guion educativo en español...',
-      '💡 Extrayendo los puntos fijos para el examen...',
+      'Analizando material visual y fórmulas...',
+      'Estructurando guion de diálogo educativo...',
+      'Configurando voces de estudio y modulación...',
+      'Generando puntos clave de evaluación...',
     ];
 
     let stepIndex = 0;
@@ -131,7 +193,6 @@ export default function Home() {
       });
 
       clearInterval(stepInterval);
-
       const data = await response.json();
 
       if (!response.ok) {
@@ -145,18 +206,24 @@ export default function Home() {
         throw new Error('No se recibió el podcast generado.');
       }
 
-      setActiveEpisode(data.episode);
+      // Attach configured ElevenLabs voices
+      const episodeWithVoices: PodcastEpisode = {
+        ...data.episode,
+        hosts: {
+          hostA: { ...data.episode.hosts.hostA, elevenLabsVoiceId: voiceA || undefined },
+          hostB: { ...data.episode.hosts.hostB, elevenLabsVoiceId: voiceB || undefined },
+        },
+      };
 
-      // Save to saved list automatically
-      handleSaveEpisode(data.episode);
+      setActiveEpisode(episodeWithVoices);
+      handleSaveEpisode(episodeWithVoices);
 
-      // Confetti celebratory burst!
       try {
         confetti({
-          particleCount: 80,
-          spread: 70,
+          particleCount: 50,
+          spread: 60,
           origin: { y: 0.6 },
-          colors: ['#f43f5e', '#fbbf24', '#a855f7'],
+          colors: ['#ffffff', '#71717a', '#a1a1aa'],
         });
       } catch {}
 
@@ -164,7 +231,7 @@ export default function Home() {
     } catch (err: any) {
       clearInterval(stepInterval);
       setErrorMessage(
-        err.message || 'No se pudo generar el podcast. Verifica tu clave de API o conexión.'
+        err.message || 'No se pudo generar el podcast. Verifica tu conexión o API Key.'
       );
     } finally {
       setIsGenerating(false);
@@ -176,100 +243,115 @@ export default function Home() {
     ? savedEpisodes.some((e) => e.id === activeEpisode.id)
     : false;
 
+  const hasElevenLabsVoices = Boolean(voiceA || voiceB);
+
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-rose-500/30 selection:text-rose-200">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-zinc-800 selection:text-white">
       {/* Top Navbar */}
       <Navbar
         onNewPodcast={() => setActiveEpisode(null)}
         onLoadDemo={handleLoadDemo}
         onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+        onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
         onOpenSavedModal={() => setIsSavedModalOpen(true)}
         savedCount={savedEpisodes.length}
         hasApiKey={Boolean(apiKey)}
+        hasElevenLabsVoices={hasElevenLabsVoices}
         isPlayerActive={Boolean(activeEpisode)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {activeEpisode ? (
           /* Active Podcast Player View */
           <div className="space-y-6">
             <button
               onClick={() => setActiveEpisode(null)}
-              className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-400 hover:text-white transition-colors px-3 py-1.5 rounded-xl bg-neutral-900/60 border border-neutral-800"
+              className="inline-flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Volver a subir diapositivas / Crear otro podcast</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Volver al Estudio / Cargar otras diapositivas</span>
             </button>
 
             <PodcastPlayer
               episode={activeEpisode}
               onSaveEpisode={handleSaveEpisode}
               isSaved={isCurrentSaved}
+              onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
+              elevenLabsApiKey={elevenLabsApiKey}
             />
           </div>
         ) : (
-          /* Studio Creation View */
-          <div className="space-y-10 max-w-4xl mx-auto">
-            {/* Hero Banner */}
-            <div className="text-center space-y-4 pt-4 sm:pt-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold">
-                <Coffee className="w-3.5 h-3.5 text-amber-400" />
-                <span>Estudia con el chisme y aprueba tu examen</span>
+          /* Studio Creation View (DaVinci / Podbean Inspired) */
+          <div className="space-y-12 max-w-4xl mx-auto">
+            {/* Serious Hero Banner */}
+            <div className="text-center space-y-4 pt-2 sm:pt-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-[11px] font-mono tracking-wider uppercase">
+                <AudioWaveform className="w-3.5 h-3.5 text-zinc-300" />
+                <span>Estudio de Audio con IA para Educación</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-                Convierte tus apuntes en un{' '}
-                <span className="bg-gradient-to-r from-amber-300 via-rose-400 to-pink-500 bg-clip-text text-transparent">
-                  podcast de chisme
-                </span>{' '}
-                en español 🎙️
+              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
+                Herramientas de podcast y síntesis de estudio con IA
               </h1>
 
-              <p className="text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-                Sube fotos de tus diapositivas o libro. Valeria y Mateo te sueltan la sopa
-                con todo el drama de una telenovela pero con los datos exactos que necesitas para memorizarlo todo.
+              <p className="text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+                Convierte diapositivas, textos y notas visuales en conversaciones de audio hiperrealistas en segundos.
+                Domina cualquier tema complejo con narrativa inteligente, rigor académico y voces de alta fidelidad.
               </p>
 
-              {/* Quick Demo CTA */}
-              <div className="pt-2">
+              {/* ElevenLabs Quick Voice Badge / Configure */}
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsVoiceModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition-all active:scale-95 shadow-sm"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-violet-400" />
+                  <span>
+                    {hasElevenLabsVoices
+                      ? 'Voces ElevenLabs Conectadas'
+                      : 'Importar Voces ElevenLabs'}
+                  </span>
+                </button>
+
                 <button
                   type="button"
                   onClick={handleLoadDemo}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-200 transition-all hover:scale-105 active:scale-95"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-all active:scale-95"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>¿Tienes prisa? Escucha el Demo: Fotosíntesis vs Mitocondria 🍃⚡</span>
+                  <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Probar Demostración (Biología Celular)</span>
                 </button>
               </div>
             </div>
 
             {/* Error Notification */}
             {errorMessage && (
-              <div className="p-4 rounded-2xl bg-red-950/60 border border-red-500/50 text-red-200 text-sm flex items-start justify-between gap-3 shadow-lg">
+              <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-start justify-between gap-3 shadow-md">
                 <div className="flex items-start gap-2.5">
-                  <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                   <div>
-                    <strong className="font-semibold block mb-0.5">Atención:</strong>
+                    <strong className="font-semibold block mb-0.5">Aviso del sistema:</strong>
                     <span>{errorMessage}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => setErrorMessage(null)}
-                  className="text-red-400 hover:text-white text-xs px-2 py-1"
+                  className="text-red-400 hover:text-white text-xs px-1"
                 >
                   ✕
                 </button>
               </div>
             )}
 
-            {/* Step 1: Upload Images */}
+            {/* Studio Workspace Section 1: Upload Images */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-rose-500 text-white font-bold text-xs flex items-center justify-center">
-                  1
+                <span className="w-5 h-5 rounded-md bg-zinc-800 text-zinc-300 font-mono font-bold text-xs flex items-center justify-center border border-zinc-700">
+                  01
                 </span>
-                <h2 className="text-base sm:text-lg font-bold text-white">
-                  Sube tus diapositivas o fotos del tema
+                <h2 className="text-sm sm:text-base font-semibold text-white">
+                  Material de Estudio &amp; Diapositivas
                 </h2>
               </div>
 
@@ -280,14 +362,14 @@ export default function Home() {
               />
             </div>
 
-            {/* Step 2: Configure Tone & Generate */}
+            {/* Studio Workspace Section 2: Generation Setup */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center">
-                  2
+                <span className="w-5 h-5 rounded-md bg-zinc-800 text-zinc-300 font-mono font-bold text-xs flex items-center justify-center border border-zinc-700">
+                  02
                 </span>
-                <h2 className="text-base sm:text-lg font-bold text-white">
-                  Elige el tono de chisme y genera
+                <h2 className="text-sm sm:text-base font-semibold text-white">
+                  Parámetros de Síntesis y Enfoque
                 </h2>
               </div>
 
@@ -303,40 +385,40 @@ export default function Home() {
               />
             </div>
 
-            {/* Feature Highlights Footer Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-neutral-900">
-              <div className="p-4 rounded-2xl bg-neutral-900/30 border border-neutral-900 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-300 flex items-center justify-center shrink-0">
-                  <Volume2 className="w-4 h-4" />
+            {/* Studio Feature Highlights (Podbean style) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-zinc-900">
+              <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-900 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 flex items-center justify-center shrink-0">
+                  <Headphones className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-neutral-200">Doble Voz en Español</h4>
-                  <p className="text-[11px] text-neutral-400 leading-relaxed mt-0.5">
-                    Conversación natural entre Valeria y Mateo con voces diferenciadas y sincronizadas.
+                  <h4 className="text-xs font-semibold text-zinc-200">Voces ElevenLabs</h4>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5">
+                    Soporte para enlaces e IDs de voces de ElevenLabs Multilingual y síntesis nativa.
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-neutral-900/30 border border-neutral-900 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0">
-                  <Brain className="w-4 h-4" />
+              <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-900 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 flex items-center justify-center shrink-0">
+                  <Layers className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-neutral-200">Diapositivas en Vivo</h4>
-                  <p className="text-[11px] text-neutral-400 leading-relaxed mt-0.5">
-                    La pantalla muestra automáticamente la diapositiva exacta de la que están hablando.
+                  <h4 className="text-xs font-semibold text-zinc-200">Sincronización Visual</h4>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5">
+                    La vista se actualiza automáticamente con la diapositiva en discusión en tiempo real.
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-neutral-900/30 border border-neutral-900 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
-                  <CheckCircle className="w-4 h-4" />
+              <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-900 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-neutral-200">Puntos para el Examen</h4>
-                  <p className="text-[11px] text-neutral-400 leading-relaxed mt-0.5">
-                    Acordeón con los datos clave, mnemotecnias y tips para responder preguntas fijas.
+                  <h4 className="text-xs font-semibold text-zinc-200">Evaluación y Puntos Clave</h4>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5">
+                    Extracción estructurada de conceptos indispensables para exámenes académicos.
                   </p>
                 </div>
               </div>
@@ -345,14 +427,23 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-neutral-900 py-6 text-center text-xs text-neutral-500">
+      {/* Studio Footer */}
+      <footer className="border-t border-zinc-900 py-6 text-center text-xs text-zinc-600 font-mono">
         <p>
-          ChismeStudy ☕🎙️ • Tu compañero de estudio en español listo para desplegar en Vercel.
+          ChismeStudy Studio AI • Next.js &amp; Vercel Ready
         </p>
       </footer>
 
       {/* Modals */}
+      <VoiceSettingsModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        voiceA={voiceA}
+        voiceB={voiceB}
+        elevenLabsApiKey={elevenLabsApiKey}
+        onSave={handleSaveVoices}
+      />
+
       <ApiKeyModal
         isOpen={isApiKeyModalOpen}
         onClose={() => setIsApiKeyModalOpen(false)}

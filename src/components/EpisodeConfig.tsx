@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { PodcastVibe } from '@/types/podcast';
-import { Coffee, Users, HelpCircle, Zap, Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, MessageSquare, BookOpen, Brain, Zap } from 'lucide-react';
 
 interface EpisodeConfigProps {
   topic: string;
@@ -31,66 +31,61 @@ export function EpisodeConfig({
     tagline: string;
     icon: React.ReactNode;
     badge: string;
-    color: string;
   }> = [
     {
       id: 'puro-chisme',
-      title: 'El Puro Chisme ☕',
-      tagline: '¡Amiga, no sabes el escándalo! Telenovela dramática pero con datos 100% reales para el examen.',
-      icon: <Coffee className="w-5 h-5 text-amber-400" />,
-      badge: 'El Favorito 🔥',
-      color: 'border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-200',
+      title: 'Narrativa Conversacional ("El Chisme")',
+      tagline: 'Analogías vivas, drama educativo y narrativa cautivadora que hace que cada concepto se vuelva inolvidable.',
+      icon: <MessageSquare className="w-4 h-4 text-zinc-300" />,
+      badge: 'Recomendado',
     },
     {
       id: 'estudio-relajado',
-      title: 'Compañeros de Estudio 👯',
-      tagline: 'Buena onda, dos amigos estudiando en la cafetería con preguntas directas y analogías cotidianas.',
-      icon: <Users className="w-5 h-5 text-rose-400" />,
-      badge: 'Tranqui & Chill',
-      color: 'border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-200',
+      title: 'Estudio Colaborativo',
+      tagline: 'Tono amigable y equilibrado entre dos compañeros de estudio explicando dudas frecuentes con claridad.',
+      icon: <BookOpen className="w-4 h-4 text-zinc-300" />,
+      badge: 'Equilibrado',
     },
     {
       id: 'el-esceptico',
-      title: 'El Escéptico & El Cerebro 🧠',
-      tagline: 'Uno cuestiona por qué tenemos que aprender esto y el otro se lo demuestra con lógica impecable.',
-      icon: <HelpCircle className="w-5 h-5 text-purple-400" />,
-      badge: 'Debate Lógico',
-      color: 'border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-purple-200',
+      title: 'Debate Crítico & Demostración',
+      tagline: 'Uno cuestiona la lógica y plantea dudas difíciles, mientras el otro demuestra los fundamentos con rigor.',
+      icon: <Brain className="w-4 h-4 text-zinc-300" />,
+      badge: 'Analítico',
     },
     {
       id: 'repaso-expres',
-      title: 'Repaso Exprés / Examen Mañana ⚡',
-      tagline: 'Rápido, dinámico, mnemotecnias, trampas comunes y datos fijos que siempre vienen en el examen.',
-      icon: <Zap className="w-5 h-5 text-emerald-400" />,
-      badge: 'Salvavidas 🚨',
-      color: 'border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-200',
+      title: 'Síntesis de Alto Rendimiento',
+      tagline: 'Enfoque directo al grano: preguntas fijas de examen, mnemotecnias y conceptos esenciales.',
+      icon: <Zap className="w-4 h-4 text-zinc-300" />,
+      badge: 'Rápido',
     },
   ];
 
   return (
-    <div className="w-full space-y-6 bg-neutral-900/40 border border-neutral-800 rounded-2xl p-5 sm:p-6 backdrop-blur-sm">
-      {/* Topic / Focus input */}
+    <div className="w-full space-y-6 bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 sm:p-7 backdrop-blur-xl">
+      {/* Focus input */}
       <div className="space-y-2">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300">
-          ¿En qué quieres que se enfoquen? (Opcional)
+        <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 font-mono">
+          Enfoque o tema específico (Opcional)
         </label>
         <input
           type="text"
           value={topic}
           onChange={(e) => onTopicChange(e.target.value)}
-          placeholder="Ej: Ciclo de Krebs, causas de la Segunda Guerra Mundial, o déjalo vacío para que la IA lo descubra..."
+          placeholder="Ej: Fisiología celular, Ciclo de Calvin, o dejar vacío para auto-detección con IA..."
           disabled={isGenerating}
-          className="w-full px-4 py-2.5 rounded-xl bg-neutral-950/80 border border-neutral-800 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm text-neutral-200 placeholder-neutral-500 transition-all outline-none"
+          className="w-full px-4 py-3 rounded-xl bg-zinc-950/80 border border-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition-all"
         />
       </div>
 
-      {/* Vibe Selection */}
+      {/* Style selector */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300">
-            Elige el estilo de conversación
+          <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 font-mono">
+            Modalidad de Síntesis
           </label>
-          <span className="text-[11px] text-neutral-400">Todo se genera en español</span>
+          <span className="text-[11px] text-zinc-500 font-mono">Español Multilingual</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -100,22 +95,24 @@ export function EpisodeConfig({
               <div
                 key={item.id}
                 onClick={() => !isGenerating && onVibeChange(item.id)}
-                className={`relative p-4 rounded-xl border cursor-pointer transition-all ${
+                className={`p-4 rounded-xl border cursor-pointer transition-all ${
                   isSelected
-                    ? `${item.color} ring-2 ring-rose-500/60 shadow-lg shadow-rose-950/30 scale-[1.01]`
-                    : 'border-neutral-800 bg-neutral-950/40 hover:bg-neutral-900/60 text-neutral-400 hover:text-neutral-200'
-                } ${isGenerating ? 'pointer-events-none opacity-60' : ''}`}
+                    ? 'border-zinc-300 bg-zinc-800/80 text-white shadow-md'
+                    : 'border-zinc-800/80 bg-zinc-950/50 hover:bg-zinc-900/70 text-zinc-400 hover:text-zinc-200'
+                } ${isGenerating ? 'pointer-events-none opacity-50' : ''}`}
               >
-                <div className="flex items-start justify-between gap-2 mb-1.5">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-2">
                     {item.icon}
-                    <h4 className="font-semibold text-sm text-neutral-100">{item.title}</h4>
+                    <h4 className="font-semibold text-xs text-zinc-100">{item.title}</h4>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300 shrink-0">
+                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
+                    isSelected ? 'bg-zinc-900 text-zinc-200' : 'bg-zinc-900 text-zinc-500'
+                  }`}>
                     {item.badge}
                   </span>
                 </div>
-                <p className="text-xs text-neutral-400 leading-relaxed pl-7">
+                <p className="text-xs text-zinc-400 leading-relaxed">
                   {item.tagline}
                 </p>
               </div>
@@ -130,26 +127,26 @@ export function EpisodeConfig({
           type="button"
           onClick={onGenerate}
           disabled={isGenerating || imageCount === 0}
-          className={`w-full py-4 px-6 rounded-2xl font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all shadow-xl ${
+          className={`w-full py-3.5 px-6 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-md ${
             imageCount === 0
-              ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700'
+              ? 'bg-zinc-900 text-zinc-600 border border-zinc-800 cursor-not-allowed'
               : isGenerating
-              ? 'bg-rose-950 text-rose-300 border border-rose-500/40 cursor-wait'
-              : 'bg-gradient-to-r from-rose-500 via-pink-600 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white shadow-rose-600/30 hover:scale-[1.01] active:scale-[0.99]'
+              ? 'bg-zinc-800 text-zinc-300 border border-zinc-700 cursor-wait'
+              : 'bg-white hover:bg-zinc-200 text-zinc-950 active:scale-[0.99]'
           }`}
         >
           {isGenerating ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin text-rose-300" />
-              <span>{loadingStepText || 'Generando el chisme de estudio...'}</span>
+              <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />
+              <span>{loadingStepText || 'Procesando síntesis de podcast...'}</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-4 h-4 text-zinc-900" />
               <span>
                 {imageCount === 0
-                  ? 'Sube al menos 1 imagen para generar'
-                  : `Generar Podcast con ${imageCount} diapositiva${imageCount > 1 ? 's' : ''} 🎙️`}
+                  ? 'Sube al menos 1 diapositiva para comenzar'
+                  : `Generar Podcast con ${imageCount} diapositiva${imageCount > 1 ? 's' : ''}`}
               </span>
             </>
           )}

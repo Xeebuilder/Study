@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { UploadCloud, Image as ImageIcon, Trash2, Plus, Sparkles, AlertCircle } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Trash2, Plus, AlertCircle } from 'lucide-react';
 import { StudyImage } from '@/types/podcast';
 
 interface ImageUploaderProps {
@@ -110,16 +110,16 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
 
   return (
     <div className="w-full space-y-4">
-      {/* Dropzone Box */}
+      {/* Studio Dropzone Box */}
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => !disabled && fileInputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all ${
+        className={`relative border border-dashed rounded-2xl p-7 sm:p-9 text-center cursor-pointer transition-all ${
           isDragging
-            ? 'border-rose-400 bg-rose-950/30 scale-[1.01]'
-            : 'border-neutral-800 hover:border-rose-500/50 bg-neutral-900/40 hover:bg-neutral-900/70'
+            ? 'border-zinc-400 bg-zinc-900/60 scale-[1.005]'
+            : 'border-zinc-800 hover:border-zinc-600 bg-zinc-900/30 hover:bg-zinc-900/50'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <input
@@ -133,36 +133,32 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
         />
 
         <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500/20 to-amber-500/20 border border-rose-500/30 flex items-center justify-center text-rose-300">
-            <UploadCloud className="w-7 h-7" />
+          <div className="w-12 h-12 rounded-xl bg-zinc-800/80 border border-zinc-700/60 flex items-center justify-center text-zinc-300">
+            <UploadCloud className="w-6 h-6" />
           </div>
 
           <div className="space-y-1">
-            <p className="text-sm sm:text-base font-semibold text-neutral-200">
-              Arrastra aquí tus diapositivas, fotos del libro o apuntes
+            <p className="text-sm font-medium text-zinc-200">
+              Arrastra o selecciona tus diapositivas y apuntes de estudio
             </p>
-            <p className="text-xs text-neutral-400 max-w-md mx-auto">
-              O haz clic para explorar tus archivos. También puedes pegar una captura de pantalla directamente con{' '}
-              <kbd className="px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-300 text-[10px] font-mono">
-                Ctrl+V
-              </kbd>{' '}
-              /{' '}
-              <kbd className="px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-300 text-[10px] font-mono">
+            <p className="text-xs text-zinc-500 max-w-md mx-auto">
+              PNG, JPG o capturas de pantalla pegadas directamente con{' '}
+              <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-mono">
                 Cmd+V
               </kbd>
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-neutral-400">
-            <span className="px-2 py-0.5 rounded-full bg-neutral-800 border border-neutral-700">PNG, JPG, WEBP</span>
+          <div className="flex items-center gap-2 text-[11px] text-zinc-500 font-mono">
+            <span>Hasta 8 diapositivas</span>
             <span>•</span>
-            <span>Hasta 8 imágenes</span>
+            <span>Visión IA Multimodal</span>
           </div>
         </div>
       </div>
 
       {errorMessage && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs">
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-950/40 border border-red-500/30 text-red-300 text-xs">
           <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
           <span>{errorMessage}</span>
         </div>
@@ -170,13 +166,13 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
 
       {/* Uploaded Images Gallery */}
       {images.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-neutral-400">
-            <span className="font-medium text-neutral-300">
-              Imágenes agregadas ({images.length}/8)
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between text-xs text-zinc-400">
+            <span className="font-medium text-zinc-300">
+              Diapositivas listas para procesar ({images.length}/8)
             </span>
-            <span className="text-[11px] text-rose-300/80">
-              Los anfitriones hablarán de cada una en este orden
+            <span className="text-[11px] text-zinc-500 font-mono">
+              Secuencia cronológica de análisis
             </span>
           </div>
 
@@ -184,7 +180,7 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
             {images.map((img, idx) => (
               <div
                 key={img.id}
-                className="group relative rounded-xl overflow-hidden border border-neutral-800 bg-neutral-900 aspect-video flex items-center justify-center shadow-md hover:border-rose-500/50 transition-colors"
+                className="group relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900 aspect-video flex items-center justify-center shadow-sm hover:border-zinc-600 transition-colors"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -194,8 +190,8 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
                 />
 
                 {/* Badge Number */}
-                <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-neutral-950/85 backdrop-blur-sm border border-neutral-700 text-[11px] font-bold text-amber-300 flex items-center gap-1 shadow">
-                  <span>Diapositiva {idx + 1}</span>
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-zinc-700 text-[10px] font-mono font-semibold text-zinc-200">
+                  SLIDE {idx + 1}
                 </div>
 
                 {/* Remove Button */}
@@ -206,7 +202,7 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
                       e.stopPropagation();
                       removeImage(img.id);
                     }}
-                    className="absolute top-1.5 right-1.5 p-1 rounded-md bg-red-900/80 hover:bg-red-800 text-red-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2 right-2 p-1 rounded-md bg-zinc-900/90 hover:bg-red-950 text-zinc-400 hover:text-red-300 border border-zinc-700 opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Eliminar diapositiva"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -214,7 +210,7 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
                 )}
 
                 {/* Name tooltip */}
-                <div className="absolute bottom-0 inset-x-0 bg-neutral-950/80 backdrop-blur-xs px-2 py-1 text-[10px] text-neutral-300 truncate">
+                <div className="absolute bottom-0 inset-x-0 bg-black/85 backdrop-blur-xs px-2.5 py-1 text-[10px] text-zinc-400 truncate font-mono">
                   {img.name}
                 </div>
               </div>
@@ -225,10 +221,10 @@ export function ImageUploader({ images, onImagesChange, disabled }: ImageUploade
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="rounded-xl border border-dashed border-neutral-800 hover:border-rose-500/60 bg-neutral-900/20 hover:bg-neutral-900/40 flex flex-col items-center justify-center gap-1 text-neutral-400 hover:text-rose-300 transition-colors aspect-video"
+                className="rounded-xl border border-dashed border-zinc-800 hover:border-zinc-600 bg-zinc-900/20 hover:bg-zinc-900/40 flex flex-col items-center justify-center gap-1.5 text-zinc-500 hover:text-zinc-300 transition-colors aspect-video"
               >
-                <Plus className="w-5 h-5" />
-                <span className="text-[11px] font-medium">Agregar más</span>
+                <Plus className="w-4 h-4" />
+                <span className="text-[11px] font-medium">Añadir otra</span>
               </button>
             )}
           </div>

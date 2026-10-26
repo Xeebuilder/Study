@@ -14,6 +14,7 @@ export interface HostPersona {
   voiceGender: 'female' | 'male';
   defaultPitch: number;
   defaultRate: number;
+  elevenLabsVoiceId?: string;
 }
 
 export interface DialogueLine {
@@ -23,6 +24,7 @@ export interface DialogueLine {
   text: string;
   emotion?: 'chismoso' | 'sorprendido' | 'riendo' | 'explicando' | 'dudoso' | 'enfatico';
   referencedImageIndex?: number; // Index of the uploaded image/slide this line talks about
+  audioUrl?: string; // Pre-generated or streamable audio blob URL
 }
 
 export interface StudyImage {
